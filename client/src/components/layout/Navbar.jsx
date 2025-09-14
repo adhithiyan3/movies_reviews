@@ -10,7 +10,7 @@ export default function Navbar() {
     <header className="bg-gray-900 text-white shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
         <Link to="/" className="text-2xl font-bold text-white">
-          CineNote
+          MovieReviews
         </Link>
 
         {/* Desktop Nav */}

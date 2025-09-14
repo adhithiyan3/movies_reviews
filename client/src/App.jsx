@@ -31,7 +31,6 @@ const App = () => {
             <Route path="/admin/edit-movie/:id" element={<AdminEditMovie />} />
           </Routes>
         </main>
-        <Footer />
       </div>
     </Router>
   );
