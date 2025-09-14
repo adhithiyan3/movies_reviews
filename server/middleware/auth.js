@@ -2,7 +2,8 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 async function auth(req, res, next) {
-  // Expect header like: token: <JWT>
+
+
   const token = req.header('token');
   if (!token) {
     return res.status(401).json({ message: 'No token provided' });

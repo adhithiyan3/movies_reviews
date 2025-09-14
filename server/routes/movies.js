@@ -39,9 +39,7 @@ router.get('/:id', async (req, res) => {
   res.json(movie);
 });
 
-// ========================
-// POST /movies - admin only
-// ========================
+
 const movieSchema = z.object({
   title: z.string(),
   genre: z.array(z.string()).optional(),
