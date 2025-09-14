@@ -20,6 +20,11 @@ export default function Navbar() {
           </Link>
           {user ? (
             <>
+              {user.isAdmin && (
+                <Link to="/admin/add-movie" className="text-green-400 hover:text-green-300 transition">
+                  Add Movie
+                </Link>
+              )}
               <Link to="/profile" className="hover:text-blue-400 transition">
                 Profile
               </Link>
@@ -64,6 +69,11 @@ export default function Navbar() {
             </Link>
             {user ? (
               <>
+                {user.isAdmin && (
+                  <Link to="/admin/add-movie" onClick={() => setOpen(false)} className="text-green-400 hover:text-green-300">
+                    Add Movie
+                  </Link>
+                )}
                 <Link to="/profile" onClick={() => setOpen(false)} className="hover:text-blue-400">
                   Profile
                 </Link>

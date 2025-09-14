@@ -11,6 +11,7 @@ import Register from "./pages/Auth/Register";
 import Profile from "./pages/Profile/Profile";
 import ProfileEdit from "./pages/Profile/ProfileEdit";
 import AdminAddMovie from "./pages/Admin/AdminAddMovie";
+import AdminEditMovie from "./pages/Admin/AdminEditMovie";
 
 const App = () => {
   return (
@@ -27,6 +28,7 @@ const App = () => {
             <Route path="/profile" element={<Profile />} />
             <Route path="/profile/edit" element={<ProfileEdit />} />
             <Route path="/admin/add-movie" element={<AdminAddMovie />} />
+            <Route path="/admin/edit-movie/:id" element={<AdminEditMovie />} />
           </Routes>
         </main>
         <Footer />

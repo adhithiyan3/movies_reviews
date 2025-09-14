@@ -1,16 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "../api";
 import Loader from "../components/ui/Loader";
 import ReviewCard from "../components/reviews/ReviewCard";
 import PageNavigation from "../components/layout/PageNavigation";
 import ReviewForm from "../components/reviews/ReviewForm";
+import { useAuth } from "../context/AuthContext";
 
 const MovieDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [movie, setMovie] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isInWatchlist, setIsInWatchlist] = useState(false);
 
   useEffect(() => {
     const fetchMovie = async () => {
@@ -20,6 +24,16 @@ const MovieDetails = () => {
 
         const rev = await axios.get(`/movies/${id}/reviews`);
         setReviews(rev.data.results);
+
+        if (user) {
+          try {
+            const wlRes = await axios.get(`/users/${user.id}/watchlist`);
+            const watchlistIds = new Set(wlRes.data.map(item => item.movie._id));
+            setIsInWatchlist(watchlistIds.has(id));
+          } catch (wlErr) {
+            console.error("Could not fetch watchlist status", wlErr);
+          }
+        }
       } catch (err) {
         console.error(err);
       } finally {
@@ -27,14 +41,40 @@ const MovieDetails = () => {
       }
     };
     fetchMovie();
-  }, [id]);
+  }, [id, user]);
+
+  const handleToggleWatchlist = async () => {
+    if (!user) return; // Or redirect to login
+    try {
+      if (isInWatchlist) {
+        await axios.delete(`/users/${user.id}/watchlist/${id}`);
+      } else {
+        await axios.post(`/users/${user.id}/watchlist`, { movieId: id });
+      }
+      setIsInWatchlist(!isInWatchlist);
+    } catch (err) { console.error("Failed to update watchlist", err); }
+  };
 
   const handleReviewSubmit = async (review) => {
     try {
-      const { data } = await axios.post(`/movies/${id}/reviews`, review);
-      setReviews((prev) => [data, ...prev]);
+      const { data } = await axios.post(`/movies/${id}/reviews`, review, { headers: { token: user.token } });
+      setReviews((prev) => [data.review, ...prev]); // Use the review object from response
     } catch (err) {
       console.error("Error submitting review:", err);
+    }
+  };
+
+  const handleDeleteMovie = async () => {
+    if (!window.confirm("Are you sure you want to delete this movie? This action cannot be undone.")) {
+      return;
+    }
+    try {
+      await axios.delete(`/movies/${id}`);
+      alert("Movie deleted successfully.");
+      navigate("/movies");
+    } catch (err) {
+      console.error("Failed to delete movie", err);
+      alert(err.response?.data?.message || "Failed to delete movie.");
     }
   };
 
@@ -81,6 +121,32 @@ const MovieDetails = () => {
                 </div>
               )}
             </div>
+
+            {/* Actions */}
+            {user && (
+              <div className="flex items-center space-x-4 mt-4">
+                <button
+                  onClick={handleToggleWatchlist}
+                  className={`px-6 py-3 rounded-lg font-semibold transition ${isInWatchlist ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'}`}
+                >
+                  {isInWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist'}
+                </button>
+                {user.isAdmin && (
+                  <>
+                    <Link
+                      to={`/admin/edit-movie/${id}`}
+                      className="px-6 py-3 rounded-lg font-semibold transition bg-yellow-600 hover:bg-yellow-700"
+                    >
+                      Edit
+                    </Link>
+                    <button
+                      onClick={handleDeleteMovie}
+                      className="px-6 py-3 rounded-lg font-semibold transition bg-red-800 hover:bg-red-900"
+                    >Delete</button>
+                  </>
+                )}
+              </div>
+            )}
 
             {/* Synopsis */}
             <div className="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
