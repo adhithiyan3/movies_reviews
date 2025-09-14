@@ -93,63 +93,63 @@ export default function ProfileEdit() {
   if (!user) return null;
 
   return (
-    <main className="max-w-md mx-auto p-4">
-      <h1 className="text-xl font-bold mb-4">Edit Profile</h1>
+    <main className="max-w-2xl mx-auto p-4 text-white">
+      <h1 className="text-3xl font-bold mb-6">Edit Profile</h1>
 
-      <form onSubmit={handleSubmit} className="bg-white p-4 rounded shadow-sm space-y-3">
-        {error && <div className="text-sm text-red-600">{error}</div>}
-        {success && <div className="text-sm text-green-600">{success}</div>}
+      <form onSubmit={handleSubmit} className="bg-gray-800 p-8 rounded-xl shadow-lg border border-gray-700 space-y-4">
+        {error && <div className="p-3 bg-red-500/20 text-red-400 rounded-md text-sm">{error}</div>}
+        {success && <div className="p-3 bg-green-500/20 text-green-400 rounded-md text-sm">{success}</div>}
 
-        <label className="block text-sm font-medium">Username</label>
+        <label className="block text-sm font-medium text-gray-300">Username</label>
         <input
           name="username"
           value={form.username}
           onChange={handleChange}
-          className="w-full p-2 border rounded"
+          className="w-full p-3 bg-gray-900 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Your username"
         />
 
-        <label className="block text-sm font-medium">Email</label>
+        <label className="block text-sm font-medium text-gray-300">Email</label>
         <input
           name="email"
           type="email"
           value={form.email}
           onChange={handleChange}
-          className="w-full p-2 border rounded"
+          className="w-full p-3 bg-gray-900 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="you@example.com"
         />
 
-        <label className="block text-sm font-medium">Profile picture URL</label>
+        <label className="block text-sm font-medium text-gray-300">Profile picture URL</label>
         <input
           name="profilePicture"
           value={form.profilePicture}
           onChange={handleChange}
-          className="w-full p-2 border rounded"
+          className="w-full p-3 bg-gray-900 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="https://..."
         />
 
-        <label className="block text-sm font-medium">New password (optional)</label>
+        <label className="block text-sm font-medium text-gray-300">New password (optional)</label>
         <input
           name="password"
           type="password"
           value={form.password}
           onChange={handleChange}
-          className="w-full p-2 border rounded"
+          className="w-full p-3 bg-gray-900 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Leave blank to keep current password"
         />
 
-        <label className="block text-sm font-medium">Confirm password</label>
+        <label className="block text-sm font-medium text-gray-300">Confirm password</label>
         <input
           name="confirmPassword"
           type="password"
           value={form.confirmPassword}
           onChange={handleChange}
-          className="w-full p-2 border rounded"
+          className="w-full p-3 bg-gray-900 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Repeat new password"
         />
 
-        <div className="flex gap-2 justify-end">
-          <Button type="button" onClick={() => navigate("/profile")} className="bg-gray-200 text-black">
+        <div className="flex gap-4 justify-end pt-4">
+          <Button type="button" onClick={() => navigate("/profile")} className="bg-gray-600 hover:bg-gray-500 text-white">
             Cancel
           </Button>
           <Button type="submit" disabled={loading} className="bg-blue-600 text-white">

@@ -4,39 +4,42 @@ import { useAuth } from "../../context/AuthContext";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
-  const { user, logout } = useAuth(); // ✅ use logout instead of setUser
+  const { user, logout } = useAuth();
 
   return (
-    <header className="bg-white shadow-sm sticky top-0 z-50">
-      <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-        <Link to="/" className="font-bold text-xl">
+    <header className="bg-gray-900 text-white shadow-sm sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+        <Link to="/" className="text-2xl font-bold text-white">
           CineNote
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden sm:flex gap-4 items-center">
-          <Link to="/movies" className="text-sm">
+        <nav className="hidden sm:flex items-center gap-6 text-sm">
+          <Link to="/movies" className="hover:text-blue-400 transition">
             Movies
           </Link>
           {user ? (
             <>
-              <Link to="/profile" className="text-sm">
+              <Link to="/profile" className="hover:text-blue-400 transition">
                 Profile
               </Link>
-              <button onClick={logout} className="text-sm text-red-600">
+              <button
+                onClick={logout}
+                className="text-red-500 hover:text-red-400 transition"
+              >
                 Logout
               </button>
             </>
           ) : (
-            <Link to="/login" className="text-sm">
+            <Link to="/login" className="hover:text-blue-400 transition">
               Login
             </Link>
           )}
         </nav>
 
-        {/* Mobile Menu Toggle */}
+        {/* Mobile Toggle */}
         <button
-          className="sm:hidden"
+          className="sm:hidden text-white"
           onClick={() => setOpen(!open)}
           aria-label="menu"
         >
@@ -47,26 +50,21 @@ export default function Navbar() {
             viewBox="0 0 24 24"
             stroke="currentColor"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M4 6h16M4 12h16M4 18h16"
-            />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
       </div>
 
-      {/* Mobile Dropdown */}
+      {/* Mobile Menu */}
       {open && (
-        <div className="sm:hidden bg-white border-t">
-          <div className="px-4 py-3 flex flex-col gap-2">
-            <Link to="/movies" onClick={() => setOpen(false)}>
+        <div className="sm:hidden bg-gray-800 border-t border-gray-700">
+          <div className="px-4 py-4 flex flex-col gap-3 text-sm">
+            <Link to="/movies" onClick={() => setOpen(false)} className="hover:text-blue-400">
               Movies
             </Link>
             {user ? (
               <>
-                <Link to="/profile" onClick={() => setOpen(false)}>
+                <Link to="/profile" onClick={() => setOpen(false)} className="hover:text-blue-400">
                   Profile
                 </Link>
                 <button
@@ -74,12 +72,13 @@ export default function Navbar() {
                     logout();
                     setOpen(false);
                   }}
+                  className="text-left text-red-500 hover:text-red-400"
                 >
                   Logout
                 </button>
               </>
             ) : (
-              <Link to="/login" onClick={() => setOpen(false)}>
+              <Link to="/login" onClick={() => setOpen(false)} className="hover:text-blue-400">
                 Login
               </Link>
             )}
