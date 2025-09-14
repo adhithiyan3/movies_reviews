@@ -2,14 +2,18 @@ import React, { useEffect, useState } from "react";
 import axios from "../api";
 import MovieCard from "../components/movies/MovieCard";
 import Loader from "../components/ui/Loader";
+import { useAuth } from "../context/AuthContext";
+import { genres as allGenres } from "../components/movies/GenreSelector";
 
 const Movies = () => {
+  const { user } = useAuth();
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [genre, setGenre] = useState("");
   const [year, setYear] = useState("");
   const [sort, setSort] = useState("");
+  const [watchlist, setWatchlist] = useState(new Set());
 
   useEffect(() => {
     const fetchMovies = async () => {
@@ -18,7 +22,13 @@ const Movies = () => {
         const res = await axios.get(
           `/movies?q=${query}&genre=${genre}&year=${year}&sort=${sort}`
         );
-        setMovies(res.data.results);
+        setMovies(res.data.results || []);
+
+        if (user) {
+          const wlRes = await axios.get(`/users/${user.id}/watchlist`);
+          const watchlistIds = new Set(wlRes.data.map(item => item.movie._id));
+          setWatchlist(watchlistIds);
+        }
       } catch (err) {
         console.error(err);
       } finally {
@@ -26,7 +36,20 @@ const Movies = () => {
       }
     };
     fetchMovies();
-  }, [query, genre, year, sort]);
+  }, [query, genre, year, sort, user]);
+
+  const handleToggleWatchlist = async (movieId) => {
+    if (!user) return; // Or redirect to login
+    try {
+      if (watchlist.has(movieId)) {
+        await axios.delete(`/users/${user.id}/watchlist/${movieId}`);
+        setWatchlist(prev => { const next = new Set(prev); next.delete(movieId); return next; });
+      } else {
+        await axios.post(`/users/${user.id}/watchlist`, { movieId });
+        setWatchlist(prev => new Set(prev).add(movieId));
+      }
+    } catch (err) { console.error("Failed to update watchlist", err); }
+  };
 
   return (
     <div className="min-h-screen bg-gray-900 text-white px-4 py-10">
@@ -57,9 +80,9 @@ const Movies = () => {
                 onChange={(e) => setGenre(e.target.value)}
               >
                 <option value="">All Genres</option>
-                <option value="Action">Action</option>
-                <option value="Drama">Drama</option>
-                <option value="Comedy">Comedy</option>
+                {allGenres.map(g => (
+                  <option key={g} value={g}>{g}</option>
+                ))}
               </select>
             </div>
 
@@ -96,7 +119,12 @@ const Movies = () => {
         ) : movies.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-6 pt-4">
             {movies.map((movie) => (
-              <MovieCard key={movie._id} movie={movie} />
+              <MovieCard
+                key={movie._id}
+                movie={movie}
+                isInWatchlist={watchlist.has(movie._id)}
+                onToggleWatchlist={handleToggleWatchlist}
+              />
             ))}
           </div>
         ) : (

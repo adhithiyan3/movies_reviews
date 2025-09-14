@@ -42,7 +42,7 @@ router.get('/:id', async (req, res) => {
 
 const movieSchema = z.object({
   title: z.string(),
-  genre: z.array(z.string()).optional(),
+  genre: z.array(z.string()).default([]),
   releaseYear: z.number().optional(),
   director: z.string().optional(),
   cast: z.array(z.string()).optional(),

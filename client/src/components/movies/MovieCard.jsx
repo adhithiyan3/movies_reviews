@@ -1,31 +1,40 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
-export default function MovieCard({ movie }) {
+export default function MovieCard({ movie, isInWatchlist, onToggleWatchlist }) {
+  const { user } = useAuth();
+
+  const handleButtonClick = (event) => {
+    // Stop the click from propagating to the parent Link component
+    event.preventDefault();
+    event.stopPropagation();
+    onToggleWatchlist(movie._id);
+  };
+
   return (
-    <article className="relative bg-gray-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition shadow-gray-900 border border-gray-700 hover:border-gray-500 group">
-      <Link to={`/movies/${movie._id}`} className="block">
-        <div className="aspect-[3/4] w-full bg-gray-700 overflow-hidden relative">
-          {movie.posterUrl ? (
-            <img
-              src={movie.posterUrl}
-              alt={movie.title}
-              className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-gray-500">No Image</div>
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent opacity-30" />
+    <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg flex flex-col justify-between transform hover:-translate-y-2 transition duration-300 group">
+      <Link to={`/movies/${movie._id}`} className="block flex-grow">
+        <div className="aspect-[3/4] w-full bg-gray-700 overflow-hidden">
+          <img
+            src={movie.posterUrl}
+            alt={movie.title}
+            className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+          />
         </div>
-        <div className="p-4 space-y-2">
-          <h3 className="text-lg font-semibold text-white truncate">{movie.title}</h3>
-          <p className="text-xs text-gray-400">{movie.releaseYear} • {movie.genre?.join(', ')}</p>
-          <div className="flex items-center justify-between text-gray-300">
-            <span className="font-medium">{movie.averageRating != null ? movie.averageRating.toFixed(1) : '-' } ⭐</span>
-            <span className="text-xs">{movie.reviewCount ?? 0} reviews</span>
-          </div>
+        <div className="p-4">
+          <h3 className="font-semibold text-white truncate group-hover:text-blue-400 transition">{movie.title}</h3>
+          <p className="text-xs text-gray-400 mt-1">{movie.releaseYear}</p>
         </div>
       </Link>
-    </article>
+      {user && (
+        <button
+          onClick={handleButtonClick}
+          className={`w-full text-center py-2.5 text-sm font-semibold transition ${isInWatchlist ? "bg-red-600 hover:bg-red-700" : "bg-blue-600 hover:bg-blue-700"}`}
+        >
+          {isInWatchlist ? "Remove from Watchlist" : "Add to Watchlist"}
+        </button>
+      )}
+    </div>
   );
 }
