@@ -66,4 +66,31 @@ router.post('/', auth, admin, async (req, res) => {
   res.status(201).json(movie);
 });
 
+router.put('/:id', auth, admin, async (req, res) => {
+  const validation = movieSchema.partial().safeParse(req.body); 
+  if (!validation.success) {
+    return res.status(400).json({
+      message: validation.error.errors[0].message
+    });
+  }
+
+  const movie = await Movie.findByIdAndUpdate(
+    req.params.id,
+    { $set: validation.data },
+    { new: true } 
+  );
+
+  if (!movie) return res.status(404).json({ message: 'Movie not found' });
+  res.json(movie);
+});
+
+
+router.delete('/:id', auth, admin, async (req, res) => {
+  const movie = await Movie.findByIdAndDelete(req.params.id);
+  if (!movie) return res.status(404).json({ message: 'Movie not found' });
+
+  res.json({ message: 'Movie deleted successfully' });
+});
+
+
 module.exports = router;
