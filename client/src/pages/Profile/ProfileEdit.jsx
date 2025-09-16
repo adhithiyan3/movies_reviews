@@ -2,12 +2,12 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../../api";
-import { useAuth } from "../../context/AuthContext";   
+import { useAuth } from "../../context/AuthContext";
 import Button from "../../components/ui/Button";
 
 export default function ProfileEdit() {
   const navigate = useNavigate();
-  const { user, setUser } = useAuth();   
+  const { user, setUser, token } = useAuth();  // ✅ we have token from AuthContext
 
   const [form, setForm] = useState({
     username: "",
@@ -67,15 +67,19 @@ export default function ProfileEdit() {
 
     setLoading(true);
     try {
-      const res = await API.put(`/users/${user.id}`, payload ,{
-        headers: {
-            token: user.token
-        }
+      const res = await API.put(`/users/${user.id}`, payload, {
+        headers: { token: token },  // ✅ use token from context
       });
-      console.log("Update response:", res.data);
+
       const updatedUser = res.data.user ?? null;
       if (updatedUser) {
-        setUser((prev) => ({ ...prev, ...updatedUser }));
+        // ✅ Update context and localStorage
+        setUser((prev) => {
+          const mergedUser = { ...prev, ...updatedUser };
+          localStorage.setItem("user", JSON.stringify(mergedUser)); // keep persistent
+          return mergedUser;
+        });
+
         setSuccess("Profile updated successfully.");
         setForm((s) => ({ ...s, password: "", confirmPassword: "" }));
         navigate("/profile");
@@ -96,9 +100,20 @@ export default function ProfileEdit() {
     <main className="max-w-2xl mx-auto p-4 text-white">
       <h1 className="text-3xl font-bold mb-6">Edit Profile</h1>
 
-      <form onSubmit={handleSubmit} className="bg-gray-800 p-8 rounded-xl shadow-lg border border-gray-700 space-y-4">
-        {error && <div className="p-3 bg-red-500/20 text-red-400 rounded-md text-sm">{error}</div>}
-        {success && <div className="p-3 bg-green-500/20 text-green-400 rounded-md text-sm">{success}</div>}
+      <form
+        onSubmit={handleSubmit}
+        className="bg-gray-800 p-8 rounded-xl shadow-lg border border-gray-700 space-y-4"
+      >
+        {error && (
+          <div className="p-3 bg-red-500/20 text-red-400 rounded-md text-sm">
+            {error}
+          </div>
+        )}
+        {success && (
+          <div className="p-3 bg-green-500/20 text-green-400 rounded-md text-sm">
+            {success}
+          </div>
+        )}
 
         <label className="block text-sm font-medium text-gray-300">Username</label>
         <input
@@ -119,7 +134,9 @@ export default function ProfileEdit() {
           placeholder="you@example.com"
         />
 
-        <label className="block text-sm font-medium text-gray-300">Profile picture URL</label>
+        <label className="block text-sm font-medium text-gray-300">
+          Profile picture URL
+        </label>
         <input
           name="profilePicture"
           value={form.profilePicture}
@@ -128,7 +145,9 @@ export default function ProfileEdit() {
           placeholder="https://..."
         />
 
-        <label className="block text-sm font-medium text-gray-300">New password (optional)</label>
+        <label className="block text-sm font-medium text-gray-300">
+          New password (optional)
+        </label>
         <input
           name="password"
           type="password"
@@ -138,7 +157,9 @@ export default function ProfileEdit() {
           placeholder="Leave blank to keep current password"
         />
 
-        <label className="block text-sm font-medium text-gray-300">Confirm password</label>
+        <label className="block text-sm font-medium text-gray-300">
+          Confirm password
+        </label>
         <input
           name="confirmPassword"
           type="password"
@@ -149,10 +170,18 @@ export default function ProfileEdit() {
         />
 
         <div className="flex gap-4 justify-end pt-4">
-          <Button type="button" onClick={() => navigate("/profile")} className="bg-gray-600 hover:bg-gray-500 text-white">
+          <Button
+            type="button"
+            onClick={() => navigate("/profile")}
+            className="bg-gray-600 hover:bg-gray-500 text-white"
+          >
             Cancel
           </Button>
-          <Button type="submit" disabled={loading} className="bg-blue-600 text-white">
+          <Button
+            type="submit"
+            disabled={loading}
+            className="bg-blue-600 text-white"
+          >
             {loading ? "Saving..." : "Save changes"}
           </Button>
         </div>

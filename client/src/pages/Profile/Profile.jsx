@@ -7,7 +7,7 @@ import WatchlistCard from "../../components/movies/WatchlistCard";
 import ReviewCard from "../../components/reviews/ReviewCard";
 
 const Profile = () => {
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();   // ✅ get setUser from AuthContext
   const [reviews, setReviews] = useState([]);
   const [watchlist, setWatchlist] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,6 +17,13 @@ const Profile = () => {
       try {
         setLoading(true);
         const res = await axios.get(`/users/${user.id}`);
+
+        
+        if (res.data.user) {
+          setUser((prev) => ({ ...prev, ...res.data.user }));
+          localStorage.setItem("user", JSON.stringify({ ...user, ...res.data.user }));
+        }
+
         setReviews(res.data.reviews);
 
         const wl = await axios.get(`/users/${user.id}/watchlist`);
@@ -27,8 +34,8 @@ const Profile = () => {
         setLoading(false);
       }
     };
-    if (user) fetchData();
-  }, [user]);
+    if (user?.id) fetchData();
+  }, [user?.id, setUser]);
 
   const handleRemoveFromWatchlist = async (movieId) => {
     try {
@@ -50,7 +57,11 @@ const Profile = () => {
         <div className="flex-shrink-0 w-full sm:w-48 text-center">
           <div className="w-32 h-32 rounded-full bg-gray-700 mx-auto mb-4 flex items-center justify-center text-4xl font-bold">
             {user.profilePicture ? (
-              <img src={user.profilePicture} alt={user.username} className="w-full h-full object-cover rounded-full" />
+              <img
+                src={user.profilePicture}
+                alt={user.username}
+                className="w-full h-full object-cover rounded-full"
+              />
             ) : (
               <span>{user.username?.[0]?.toUpperCase()}</span>
             )}
@@ -80,10 +91,16 @@ const Profile = () => {
             {watchlist.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {watchlist.map((item) => (
-                  <WatchlistCard key={item.id} movie={item.movie} onRemove={() => handleRemoveFromWatchlist(item.movie._id)} />
+                  <WatchlistCard
+                    key={item.id}
+                    movie={item.movie}
+                    onRemove={() => handleRemoveFromWatchlist(item.movie._id)}
+                  />
                 ))}
               </div>
-            ) : <p className="text-gray-400">Your watchlist is empty.</p>}
+            ) : (
+              <p className="text-gray-400">Your watchlist is empty.</p>
+            )}
           </div>
 
           {/* Reviews */}

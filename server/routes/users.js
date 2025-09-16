@@ -16,6 +16,7 @@ router.get('/:id', async (req, res) => {
 
   const reviews = await Review.find({ userId: user._id })
     .populate('movieId', 'title posterUrl');
+    console.log(user);
 
   res.json({ user, reviews });
 });
@@ -47,7 +48,7 @@ router.put('/:id', auth, async (req, res) => {
 
   Object.assign(user, validation.data);
   if (validation.data.password) {
-    user.password = validation.data.password; // pre-save hook hashes password
+    user.password = validation.data.password; 
   }
 
   await user.save();
