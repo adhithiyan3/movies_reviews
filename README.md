@@ -1,4 +1,4 @@
-# 🎬 CineNote – Movie Review Platform
+# 🎬 MovieReviews – Movie Review Platform
 
 A full-stack movie review platform built with **Node.js, Express, MongoDB, React, and TailwindCSS**.  
 Users can browse movies, post reviews, manage their watchlist, and admins can add new movies.
